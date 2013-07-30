@@ -12,7 +12,11 @@ import (
 )
 
 func TestKey(t *testing.T) {
-	key := MakeKey(Group1)
+	key, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
 
 	if !key.P.ProbablyPrime(20) {
 		t.Errorf("P is not prime")
@@ -28,8 +32,16 @@ func TestKey(t *testing.T) {
 }
 
 func TestAlgo(t *testing.T) {
-	k1 := MakeKey(Group1)
-	k2 := MakeKey(Group1)
+	k1, e1 := MakeKey(rand.Reader, Group1)
+	k2, e2 := MakeKey(rand.Reader, Group1)
+
+	if e1 != nil {
+		panic(e1)
+	}
+
+	if e2 != nil {
+		panic(e2)
+	}
 
 	s1 := k2.ComputeSecret(k1)
 	s2 := k1.ComputeSecret(k2)
@@ -40,7 +52,11 @@ func TestAlgo(t *testing.T) {
 }
 
 func TestSlimPub(t *testing.T) {
-	k1 := MakeKey(Group1)
+	k1, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
 
 	slim := k1.SlimPub()
 
@@ -48,7 +64,11 @@ func TestSlimPub(t *testing.T) {
 		t.Errorf("Slim key doesn't have GX")
 	}
 
-	k2 := MakeKey(Group1)
+	k2, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
 
 	s1 := slim.ComputeSecret(k2)
 	s2 := k2.SlimPub().ComputeSecret(k1)
@@ -59,9 +79,17 @@ func TestSlimPub(t *testing.T) {
 }
 
 func TestAsCryptoKey(t *testing.T) {
-	k1 := MakeKey(Group1)
+	k1, err := MakeKey(rand.Reader, Group1)
 
-	k2 := MakeKey(Group1)
+	if err != nil {
+		panic(err)
+	}
+
+	k2, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
 
 	key1 := k1.PublicKey.ComputeSecret(k2)
 
@@ -108,8 +136,17 @@ func TestAsCryptoKey(t *testing.T) {
 }
 
 func TestDeriveKey(t *testing.T) {
-	k1 := MakeKey(Group1)
-	k2 := MakeKey(Group1)
+	k1, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	k2, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
 
 	s := k1.PublicKey.ComputeSecret(k2)
 

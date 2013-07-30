@@ -2,14 +2,15 @@ package dh
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/asn1"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"hash"
+	"io"
 	"io/ioutil"
 	"math/big"
-	"math/rand"
 	"reflect"
 )
 
@@ -125,7 +126,7 @@ func (priv *PrivateKey) SlimPub() *SlimPublicKey {
 	return &SlimPublicKey{priv.GX}
 }
 
-func MakeKey(grp *Group) (priv *PrivateKey) {
+func MakeKey(rr io.Reader, grp *Group) (priv *PrivateKey, err error) {
 	priv = new(PrivateKey)
 
 	priv.P = grp.P
@@ -134,9 +135,12 @@ func MakeKey(grp *Group) (priv *PrivateKey) {
 	q := new(big.Int).Sub(priv.P, bigOne)
 	q.Div(q, bigTwo)
 
-	rand := rand.New(rand.NewSource(0)) // TODO change me!
+	priv.X, err = rand.Int(rr, q)
 
-	priv.X = new(big.Int).Rand(rand, q)
+	if err != nil {
+		return nil, err
+	}
+
 	priv.GX = new(big.Int).Exp(priv.G, priv.X, priv.P)
 
 	return
