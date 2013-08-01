@@ -135,6 +135,42 @@ func TestAsCryptoKey(t *testing.T) {
 	}
 }
 
+func TestDeriveKeyUnique(t *testing.T) {
+	k1, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	k2, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	k3, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	k4, err := MakeKey(rand.Reader, Group1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	s1 := k1.PublicKey.ComputeSecret(k2)
+	s2 := k3.PublicKey.ComputeSecret(k4)
+
+	y1 := s1.DeriveKey(sha256.New, 32, []byte(""))
+	y2 := s2.DeriveKey(sha256.New, 32, []byte(""))
+
+	if bytes.Equal(y1, y2) {
+		t.Errorf("Derive key not producing unique keys!")
+	}
+}
+
 func TestDeriveKey(t *testing.T) {
 	k1, err := MakeKey(rand.Reader, Group1)
 

@@ -185,9 +185,10 @@ func (sec *Secret) DeriveKey(hf func() hash.Hash, keylen int, other []byte) []by
 		buf[2] = byte(counter >> 8)
 		buf[3] = byte(counter)
 
-		h.Sum(buf[:])
-		h.Sum(sec.S.Bytes())
-		dk.Write(h.Sum(other))
+		h.Write(buf[:])
+		h.Write(sec.S.Bytes())
+		h.Write(other)
+		dk.Write(h.Sum(nil))
 
 		h = hf()
 	}
